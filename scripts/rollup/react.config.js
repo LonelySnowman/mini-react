@@ -7,6 +7,7 @@ const pkgPath = resolvePkgPath(name); // react包的路径
 const pkgDistPath = resolvePkgPath(name, true); // react产物路径
 
 export default [
+	// React 包
 	{
 		input: `${pkgPath}/${module}`,
 		output: {
