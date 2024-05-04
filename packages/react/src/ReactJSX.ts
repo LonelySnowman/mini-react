@@ -32,6 +32,10 @@ const ReactElement = function (
 	return element;
 };
 
+/**
+ * @default 判断 Element 是否合规
+ * @param object Element 对象
+ */
 export function isValidElement(object: any) {
 	return (
 		typeof object === 'object' &&
@@ -40,6 +44,11 @@ export function isValidElement(object: any) {
 	);
 }
 
+/**
+ * @description 创建 Element 将 config 进行一次转化
+ * @param type
+ * @param config
+ */
 export const createElement = (
 	type: ElementType,
 	config: any,
@@ -48,19 +57,14 @@ export const createElement = (
 	let key: Key = null;
 	const props: Props = {};
 	let ref: Ref = null;
-
 	for (const prop in config) {
 		const val = config[prop];
 		if (prop === 'key') {
-			if (val !== undefined) {
-				key = '' + val;
-			}
+			if (val !== undefined) key = '' + val;
 			continue;
 		}
 		if (prop === 'ref') {
-			if (val !== undefined) {
-				ref = val;
-			}
+			if (val !== undefined) ref = val;
 			continue;
 		}
 		if ({}.hasOwnProperty.call(config, prop)) {
@@ -86,7 +90,7 @@ export const Fragment = REACT_FRAGMENT_TYPE;
  * @param config 传入的 props
  * @param maybeKey
  */
-export const jsx = (type: ElementType, config: any, maybeKey: any) => {
+export const reactJSX = (type: ElementType, config: any, maybeKey: any) => {
 	// Element 的唯一 Key
 	let key: Key = null;
 	// Element ref
@@ -117,4 +121,4 @@ export const jsx = (type: ElementType, config: any, maybeKey: any) => {
 
 // 开发环境与生产环境 jsx 一致
 // 源码中 jsxDEV 会多一些开发环境校验
-export const jsxDEV = jsx;
+export const jsxDEV = reactJSX;

@@ -105,3 +105,94 @@ export let REACT_FRAGMENT_TYPE = 0xeacb;
 
 ### 实现 jsx 解析
 
+第一步 babel 转义 jsx 文件，jsx 都会被转化为 jsx 函数返回 ReactElement
+
+- packages/react/src/jsx.ts
+- packages/react/index.ts
+- packages/shared/ReactSymbols.ts
+- packages/shared/ReactTypes.ts
+- scripts/rollup/react.config.js
+- scripts/rollup/utils.js
+
+===
+
+- jsx 转化为 ReactElement，ReactElement 只是与对用户编写 jsx 的转化。
+- 不能表达与其他模块的关系。
+- 不能表达节点变更的状态
+
+### 实现 fiber 协调器
+
+协调器负责计算节点的变化
+
+1. 产生新的 ReactElement
+2. ReactElement 转化为 Fiber 树
+3. 新的 Fiber 树与旧的 Fiber 树进行比较
+4. 对比出更新操作标记 Flag (增删改查等)
+5. 根据 Flag 执行更新
+
+双缓冲架构
+- current：与真实 UI 对应的 Fiber 树
+- workInProgress：更新后的 Fiber 树
+
+jsx 消费过程
+- dfs 有子遍历子，无子遍历兄弟
+
+===
+
+- packages/react-reconciler/src/fiber.ts Fiber 数据结构 1
+- packages/react-reconciler/src/workTags.ts Fiber 节点类型 2
+- packages/react-reconciler/src/fiberFlags.ts Fiber 变更 Flag 3
+- workLoop 4 循环更新工作
+- beginWork 5 开始更新操作
+- completeWork 6 结束更新操作
+- queue 7 更新队列
+
+## 触发更新
+
+- 触发更新的方法 createRoot setState
+
+记录一个 update 队列记录更新的状态，然后去消费这个队列进行更新！
+updateQueue 进行记录
+
+
+- `React.createRoot(rootElement).render(<APP/>)`
+
+React.createRoot 创建当前路径统一根节点Fiber FiberRootNode，根 DOM Fiber 节点 hostRootFiber 子节点为 APP
+FiberRootNode.current = hostRootFiber, hostRootFiber.stateNode = FiberRootNode
+
+
+## Mount 流程
+
+### BeginWork
+
+副作用只有两个
+
+副作用变化 Flags
+- Placement 插入/移动 副作用
+- ChildDeletion 子节点删除 副作用
+
+BeginWork 性能优化策略
+
+```jsx
+<div>
+ <p>P Text</p>
+ <span>Span Text</span>
+</div>
+```
+理论上需要对每个 DOM 节点和 TEXT 标记五次 Placement 操作
+
+可以内部进行 离屏DOM 构建 只对根节点进行一次 Placement
+
+
+### CompleteWork
+- 对于 Host 类型的 FiberNode 构建离屏的 DOM 树
+- 标记 Update Flag
+
+CompleteWork 优化策略
+flags 分布在不同的 fiberNode 中 如何快速找到他们？
+
+利用 completeWork 向上遍历的流程 将子 fiberNode 的 flags 冒泡到父 fiberNode
+
+bubbleProperties 收集 subtreeFlags
+
+
