@@ -43,12 +43,13 @@ export const processUpdateQueue = <State>(
 	baseState: State,
 	pendingUpdate: Update<State> | null
 ): { memoizedState: State } => {
-	const result: ReturnType<typeof processUpdateQueue<State>>;
-
+	const result: ReturnType<typeof processUpdateQueue<State>> = {
+		memoizedState: baseState
+	};
 	if (pendingUpdate !== null) {
 		// 更新两种情况 传入更新后的值或者函数
 		const action = pendingUpdate.action;
-		if (typeof action === 'function') {
+		if (action instanceof Function) {
 			result.memoizedState = action(baseState);
 		} else {
 			result.memoizedState = action;

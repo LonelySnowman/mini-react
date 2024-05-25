@@ -4,6 +4,8 @@ import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
 import { HostText } from './ReactWorkTags';
 import { Placement } from './ReactFiberFlags';
 
+// LJQFLAG 构建 Fiber 树并标记副作用
+
 // shouldTrackEffects 是否追踪副作用
 // true 追踪副作用 更新时调用
 // false 不追踪副作用 初次挂载时调用
@@ -11,7 +13,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 	// 构建 ReactElement 的 Fiber
 	function reconcileSingleElement(
 		returnFiber: FiberNode,
-		currentFiber: FiberNode | null, // 这个时干嘛的
+		currentFiber: FiberNode | null, // 这个是干嘛的
 		element: ReactElementType
 	) {
 		const fiber = createFiberFromElement(element);
@@ -34,7 +36,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 	function placeSingleChild(fiber: FiberNode) {
 		// 首屏渲染且需要副作用渲染标记 Placement
 		if (shouldTrackEffects && fiber.alternate === null) {
-			fiber.flags = Placement;
+			fiber.flags |= Placement;
 		}
 		return fiber;
 	}
@@ -51,9 +53,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 						reconcileSingleElement(returnFiber, currentFiber, newChild)
 					);
 				default:
-					if (__DEV__) {
-						console.warn('未实现的reconcile类型', newChild);
-					}
+					if (__DEV__) console.warn('未实现的reconcile类型', newChild);
 					break;
 			}
 		}
@@ -66,9 +66,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			);
 		}
 
-		if (__DEV__) {
-			console.warn();
-		}
+		if (__DEV__) console.warn('该节点不支持');
 		return null;
 	};
 }

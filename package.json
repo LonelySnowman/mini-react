@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:dev": "rm -rf dist && rollup --bundleConfigAsCjs --config scripts/rollup/react.config.js",
+    "build:dev": "rimraf -rf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
     "prepare": "husky"
   },
   "keywords": [],
@@ -14,6 +14,7 @@
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-replace": "^5.0.5",
     "@typescript-eslint/eslint-plugin": "^7.6.0",

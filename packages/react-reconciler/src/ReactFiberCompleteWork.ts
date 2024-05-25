@@ -2,6 +2,7 @@ import { FiberNode } from './ReactFiber';
 import { HostComponent, HostRoot, HostText } from './ReactWorkTags';
 import {
 	appendInitialChild,
+	Container,
 	createInstance,
 	createTextInstance
 } from 'hostConfig';
@@ -21,8 +22,8 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 			} else {
 				// 1. 构建 DOM
 				const instance = createInstance(workInProgress.type, newProps);
-				// 2. 将 DOM 插入到 DOM 树
-				appendInitialChild(instance, workInProgress);
+				// 2. 将 DOM 插入到 fiberNode 中的 stateNode
+				appendAllChildren(instance, workInProgress);
 				workInProgress.stateNode = instance;
 			}
 			bubbleProperties(workInProgress);
@@ -35,18 +36,17 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 				// 1. 构建 DOM
 				const instance = createTextInstance(newProps.content);
 				// 2. 将 DOM 插入到 DOM 树
-				appendInitialChild(instance, workInProgress);
 				workInProgress.stateNode = instance;
 			}
 			bubbleProperties(workInProgress);
 			return null;
 		default:
-			if (__DEV__) console.warn('该 wip tag 未实现', workInProgress.tag);
+			if (__DEV__) console.warn('该 wip tag 未实现', workInProgress?.tag);
 			break;
 	}
 };
 
-function appendAllChildren(parent: FiberNode, workInProgress: FiberNode) {
+function appendAllChildren(parent: Container, workInProgress: FiberNode) {
 	let node = workInProgress.child;
 	while (node !== null) {
 		// 深度优先遍历
@@ -86,7 +86,7 @@ function bubbleProperties(workInProgress: FiberNode) {
 		subtreeFlags |= node.subtreeFlags;
 		subtreeFlags |= workInProgress.flags;
 
-		node.return = workInProgress; // LJQFLAG 这个操作是否有些多余？
+		node.return = workInProgress;
 		node = node.sibling;
 	}
 

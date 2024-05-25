@@ -8,6 +8,7 @@ export function beginWork(workInProgress: FiberNode) {
 	switch (workInProgress.tag) {
 		case HostRoot:
 			return updateHostRoot(workInProgress);
+		// LJQFLAG 为什么这里无法触发更新？？？
 		case HostComponent:
 			return updateHostComponent(workInProgress);
 		case HostText:
@@ -30,9 +31,8 @@ export function updateHostRoot(workInProgress: FiberNode) {
 	const { memoizedState } = processUpdateQueue(baseState, pending);
 	workInProgress.memoizedState = memoizedState;
 
-	// 创建子 FiberNode 并返回
-	const nextProps = workInProgress.pendingProps;
-	const nextChildren = nextProps.children;
+	// 创建子 FiberNode 并返回 (构建 Fiber 树的过程)
+	const nextChildren = workInProgress.memoizedState;
 	reconcileChildren(workInProgress, nextChildren);
 	return workInProgress.child;
 }

@@ -26,8 +26,7 @@ const ReactElement = function (
 		type,
 		key,
 		ref,
-		props,
-		__mark: 'KaSong'
+		props
 	};
 	return element;
 };
@@ -90,7 +89,7 @@ export const Fragment = REACT_FRAGMENT_TYPE;
  * @param config 传入的 props
  * @param maybeKey
  */
-export const reactJSX = (type: ElementType, config: any, maybeKey: any) => {
+export const jsx = (type: ElementType, config: any, maybeKey: any) => {
 	// Element 的唯一 Key
 	let key: Key = null;
 	// Element ref
@@ -121,4 +120,4 @@ export const reactJSX = (type: ElementType, config: any, maybeKey: any) => {
 
 // 开发环境与生产环境 jsx 一致
 // 源码中 jsxDEV 会多一些开发环境校验
-export const jsxDEV = reactJSX;
+export const jsxDEV = jsx;

@@ -195,4 +195,18 @@ flags 分布在不同的 fiberNode 中 如何快速找到他们？
 
 bubbleProperties 收集 subtreeFlags
 
+## ReactDOM 实现
 
+react 三个阶段
+- schedule 阶段 (调度阶段 调度更新)
+- render 阶段 beginWork completeWork
+- commit 阶段
+
+commit 阶段的三个子阶段
+- beforeMutation 阶段
+- mutation 阶段
+- layout 阶段
+
+具体内容
+- fiber 树的切换
+- Placement 对应操作

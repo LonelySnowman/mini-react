@@ -12,21 +12,12 @@ import {
 } from './ReactWorkTags';
 import { Flags, NoFlags } from './ReactFiberFlags';
 import { Container } from 'hostConfig';
-import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
-import { Effect } from './fiberHooks';
-import { CallbackNode } from 'scheduler';
 import {
 	REACT_MEMO_TYPE,
 	REACT_PROVIDER_TYPE,
 	REACT_LAZY_TYPE,
 	REACT_SUSPENSE_TYPE
 } from 'shared/ReactSymbols';
-import { ContextItem } from './fiberContext';
-
-interface FiberDependencies<Value> {
-	firstContext: ContextItem<Value> | null;
-	lanes: Lanes;
-}
 
 export class FiberNode {
 	type: any;
@@ -49,10 +40,10 @@ export class FiberNode {
 	updateQueue: unknown;
 	deletions: FiberNode[] | null;
 
-	lanes: Lanes;
-	childLanes: Lanes;
-
-	dependencies: FiberDependencies<any> | null;
+	// lanes: Lanes;
+	// childLanes: Lanes;
+	//
+	// dependencies: FiberDependencies<any> | null;
 
 	/**
 	 * @description Fiber 节点构造函数
@@ -87,33 +78,32 @@ export class FiberNode {
 		this.subtreeFlags = NoFlags;
 		this.deletions = null;
 
-		this.lanes = NoLanes;
-		this.childLanes = NoLanes;
-
-		this.dependencies = null;
+		// this.lanes = NoLanes;
+		// this.childLanes = NoLanes;
+		// this.dependencies = null;
 	}
 }
 
-export interface PendingPassiveEffects {
-	unmount: Effect[];
-	update: Effect[];
-}
+// export interface PendingPassiveEffects {
+// 	unmount: Effect[];
+// 	update: Effect[];
+// }
 
 // 根 FiberRoot React.createRoot
 export class FiberRootNode {
 	container: Container; // 挂载的 node
 	current: FiberNode; // 根 DOM FiberNode (hostRootFiber)
 	finishedWork: FiberNode | null; // 更新完成的 FiberNode (更新后的 hostRootFiber)
-	pendingLanes: Lanes;
-	suspendedLanes: Lanes;
-	pingedLanes: Lanes;
-	finishedLane: Lane;
-	pendingPassiveEffects: PendingPassiveEffects;
-
-	callbackNode: CallbackNode | null;
-	callbackPriority: Lane;
-
-	pingCache: WeakMap<Wakeable<any>, Set<Lane>> | null;
+	// pendingLanes: Lanes;
+	// suspendedLanes: Lanes;
+	// pingedLanes: Lanes;
+	// finishedLane: Lane;
+	// pendingPassiveEffects: PendingPassiveEffects;
+	//
+	// callbackNode: CallbackNode | null;
+	// callbackPriority: Lane;
+	//
+	// pingCache: WeakMap<Wakeable<any>, Set<Lane>> | null;
 
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
@@ -121,20 +111,20 @@ export class FiberRootNode {
 		hostRootFiber.stateNode = this;
 
 		this.finishedWork = null;
-		this.pendingLanes = NoLanes;
-		this.suspendedLanes = NoLanes;
-		this.pingedLanes = NoLanes;
-		this.finishedLane = NoLane;
-
-		this.callbackNode = null;
-		this.callbackPriority = NoLane;
-
-		this.pendingPassiveEffects = {
-			unmount: [],
-			update: []
-		};
-
-		this.pingCache = null;
+		// this.pendingLanes = NoLanes;
+		// this.suspendedLanes = NoLanes;
+		// this.pingedLanes = NoLanes;
+		// this.finishedLane = NoLane;
+		//
+		// this.callbackNode = null;
+		// this.callbackPriority = NoLane;
+		//
+		// this.pendingPassiveEffects = {
+		// 	unmount: [],
+		// 	update: []
+		// };
+		//
+		// this.pingCache = null;
 	}
 }
 
@@ -168,47 +158,29 @@ export const createWorkInProgress = (
 	workInProgress.memoizedState = current.memoizedState;
 	workInProgress.ref = current.ref;
 
-	workInProgress.lanes = current.lanes;
-	workInProgress.childLanes = current.childLanes;
-
-	const currentDeps = current.dependencies;
-	workInProgress.dependencies =
-		currentDeps === null
-			? null
-			: {
-					lanes: currentDeps.lanes,
-					firstContext: currentDeps.firstContext
-				};
+	// workInProgress.lanes = current.lanes;
+	// workInProgress.childLanes = current.childLanes;
+	//
+	// const currentDeps = current.dependencies;
+	// workInProgress.dependencies =
+	// 	currentDeps === null
+	// 		? null
+	// 		: {
+	// 				lanes: currentDeps.lanes,
+	// 				firstContext: currentDeps.firstContext
+	// 			};
 
 	return workInProgress;
 };
 
 // 将 ReactElement 转化为 Fiber 树
 export function createFiberFromElement(element: ReactElementType): FiberNode {
-	const { type, key, props, ref } = element;
+	const { type, key, props } = element;
 	let fiberTag: WorkTag = FunctionComponent;
 
 	if (typeof type === 'string') {
 		// <div/> type: 'div'
 		fiberTag = HostComponent;
-	} else if (typeof type === 'object') {
-		switch (type.$$typeof) {
-			case REACT_PROVIDER_TYPE:
-				fiberTag = ContextProvider;
-				break;
-			case REACT_MEMO_TYPE:
-				fiberTag = MemoComponent;
-				break;
-			case REACT_LAZY_TYPE:
-				fiberTag = LazyComponent;
-			default:
-				if (__DEV__) {
-					console.warn('未定义的type类型', element);
-				}
-				break;
-		}
-	} else if (type === REACT_SUSPENSE_TYPE) {
-		fiberTag = SuspenseComponent;
 	} else if (typeof type !== 'function' && __DEV__) {
 		console.warn('为定义的type类型', element);
 	}
@@ -216,7 +188,6 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 	// 新建 Fiber
 	const fiber = new FiberNode(fiberTag, props, key);
 	fiber.type = type;
-	fiber.ref = ref;
 	return fiber;
 }
 

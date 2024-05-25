@@ -31,7 +31,7 @@ export default [
 	},
 	// jsx-runtime
 	{
-		input: `${pkgPath}/src/jsx.ts`,
+		input: `${pkgPath}/src/ReactJSX.ts`,
 		output: [
 			// jsx-runtime
 			{

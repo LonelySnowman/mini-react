@@ -1,11 +1,6 @@
 import { beginWork } from './ReactFiberBeginWork';
 import { completeWork } from './ReactFiberCompleteWork';
-import {
-	createWorkInProgress,
-	FiberNode,
-	FiberRootNode,
-	PendingPassiveEffects
-} from './ReactFiber';
+import { createWorkInProgress, FiberNode, FiberRootNode } from './ReactFiber';
 import {
 	HostEffectMask,
 	MutationMask,
@@ -13,6 +8,7 @@ import {
 	PassiveMask
 } from './ReactFiberFlags';
 import { HostRoot } from './ReactWorkTags';
+import { commitMutationEffects } from './ReactFiberCommitWork';
 
 let workInProgress: FiberNode | null = null; // 当前工作的 FiberNode
 const rootDoesHasPassiveEffects = false;
@@ -75,9 +71,12 @@ export function markUpdateFromFiberToRoot(fiber: FiberNode) {
  * @param lane
  * @param shouldTimeSlice
  */
+// 开始进入渲染
 function renderRoot(root: FiberRootNode) {
+	// 初始化 workInProgress
 	prepareFreshStack(root);
 	// 开始工作循环
+	// 使用浏览器空闲阶段进行处理
 	do {
 		try {
 			workLoop();
@@ -86,25 +85,53 @@ function renderRoot(root: FiberRootNode) {
 			console.warn('workLoop发生错误', e);
 			workInProgress = null;
 		}
-	} while (true); // 使用浏览器空闲阶段进行处理
+	} while (true);
 
-	const finishedWork = root.current.alternate;
-	root.finishedWork = finishedWork;
+	// Fiber 树更新完成进行赋值
+	root.finishedWork = root.current.alternate;
+	if (root.current.alternate?.child)
+		root.finishedWork = root.current.alternate.child;
 
 	// commit 阶段进行渲染
 	commitRoot(root);
 }
 
-/**
- *
- */
+function commitRoot(root: FiberRootNode) {
+	const finishedWork = root.finishedWork;
+
+	if (finishedWork === null) return;
+
+	if (__DEV__) console.warn('commit 阶段开始', finishedWork);
+
+	root.finishedWork = null;
+
+	// 判断是否存在 3 个子阶段需要执行的操作
+	const subtreeHasEffect =
+		(finishedWork.subtreeFlags & MutationMask) !== NoFlags;
+	const rootHasEffect = (finishedWork.flags & MutationMask) !== NoFlags;
+	if (subtreeHasEffect || rootHasEffect) {
+		// beforeMutation
+		// mutation Placement
+		commitMutationEffects(finishedWork);
+		root.current = finishedWork;
+
+		// layout
+	} else {
+		root.current = finishedWork;
+	}
+}
+
 function workLoop() {
+	// BeginWorkLoop 阶段
 	while (workInProgress !== null) {
 		performUnitOfWork(workInProgress);
 	}
 }
 
+// 这里传入的 fiber 为 workInProgress
 function performUnitOfWork(fiber: FiberNode) {
+	// next 为子 FiberNode 深度优先遍历
+	// 边向下边创建
 	const next = beginWork(fiber);
 	fiber.memoizedProps = fiber.pendingProps; // 变更更新后的 props
 	if (next === null) {
@@ -114,13 +141,14 @@ function performUnitOfWork(fiber: FiberNode) {
 	}
 }
 
+// complete 阶段构建
 function completeUnitOfWork(fiber: FiberNode) {
 	let node: FiberNode | null = fiber;
 	do {
 		completeWork(node);
-		const sibling = node?.sibling;
 
 		// 向上遍历 sibling FiberNode
+		const sibling = node?.sibling;
 		if (sibling !== null) {
 			workInProgress = sibling;
 			return;
