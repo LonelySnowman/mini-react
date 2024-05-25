@@ -8,6 +8,12 @@ import replace from '@rollup/plugin-replace';
 const pkgPath = path.resolve(__dirname, '../../packages'); // 源码包路径
 const distPath = path.resolve(__dirname, '../../dist/node_modules'); // 产物包路径
 
+/**
+ * @description 获取
+ * @param pkgName
+ * @param isDist
+ * @returns {string}
+ */
 export function resolvePkgPath(pkgName, isDist) {
 	if (isDist) return `${distPath}/${pkgName}`;
 	return `${pkgPath}/${pkgName}`;

@@ -21,6 +21,7 @@ export function updateContainer(
 	element: ReactElementType | null,
 	root: FiberRootNode
 ) {
+	debugger;
 	const hostRootFiber = root.current;
 	const update = createUpdate<ReactElementType | null>(element);
 	enqueueUpdate(

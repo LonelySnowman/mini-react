@@ -1,5 +1,10 @@
 import { FiberNode } from './ReactFiber';
-import { HostComponent, HostRoot, HostText } from './ReactWorkTags';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './ReactWorkTags';
 import {
 	appendInitialChild,
 	Container,
@@ -14,6 +19,7 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 
 	switch (workInProgress?.tag) {
 		case HostRoot:
+			bubbleProperties(workInProgress);
 			return null;
 		case HostComponent:
 			// stateNode 为保存的 DOM 节点
@@ -38,6 +44,9 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 				// 2. 将 DOM 插入到 DOM 树
 				workInProgress.stateNode = instance;
 			}
+			bubbleProperties(workInProgress);
+			return null;
+		case FunctionComponent:
 			bubbleProperties(workInProgress);
 			return null;
 		default:

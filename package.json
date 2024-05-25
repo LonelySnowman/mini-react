@@ -5,14 +5,12 @@
   "main": "index.js",
   "scripts": {
     "build:dev": "rimraf -rf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "demo": "vite serve demos/test-fc --config scripts/vite/vite.config.js --force"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "typescript": "^5.4.5"
-  },
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -28,6 +26,9 @@
     "rimraf": "^5.0.5",
     "rollup": "^4.14.2",
     "rollup-plugin-generate-package-json": "^3.2.0",
-    "rollup-plugin-typescript2": "^0.36.0"
+    "rollup-plugin-typescript2": "^0.36.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.2.0",
+    "typescript": "^5.4.5"
   }
 }

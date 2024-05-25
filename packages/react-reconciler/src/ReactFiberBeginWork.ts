@@ -1,8 +1,14 @@
 import { FiberNode } from './ReactFiber';
-import { HostComponent, HostRoot, HostText } from './ReactWorkTags';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './ReactWorkTags';
 import { processUpdateQueue, UpdateQueue } from './ReactFiberClassUpdateQueue';
 import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './ReactChildFiber';
+import { renderWithHooks } from './ReactFiberHooks';
 
 export function beginWork(workInProgress: FiberNode) {
 	switch (workInProgress.tag) {
@@ -13,6 +19,8 @@ export function beginWork(workInProgress: FiberNode) {
 			return updateHostComponent(workInProgress);
 		case HostText:
 			return null;
+		case FunctionComponent:
+			return updateFunctionComponent(workInProgress);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork类型未实现');
@@ -20,6 +28,13 @@ export function beginWork(workInProgress: FiberNode) {
 			break;
 	}
 	return null;
+}
+
+function updateFunctionComponent(workInProgress: FiberNode) {
+	const nextProps = workInProgress.pendingProps;
+	const nextChildren = renderWithHooks(workInProgress);
+	reconcileChildren(workInProgress, nextChildren);
+	return workInProgress.child;
 }
 
 export function updateHostRoot(workInProgress: FiberNode) {

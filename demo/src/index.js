@@ -7,11 +7,19 @@ const jsx = (
     </div>
 )
 
+function APP() {
+    return (
+        <div>
+            <span>mini-react</span>
+        </div>
+    )
+}
+
 const root = document.querySelector('#root')
 
 console.log(root)
 
-ReactDOM.createRoot(root).render(jsx)
+ReactDOM.createRoot(root).render(<APP></APP>)
 
 console.log(React)
 console.log(jsx)
