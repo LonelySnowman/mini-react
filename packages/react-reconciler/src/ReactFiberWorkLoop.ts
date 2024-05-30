@@ -48,10 +48,15 @@ function prepareFreshStack(root: FiberRootNode) {
 }
 
 export function scheduleUpdateOnFiber(fiber: FiberNode) {
+	// 确保获取到根 HostRootFiber 的 stateNode
 	const root = markUpdateFromFiberToRoot(fiber);
 	renderRoot(root);
 }
 
+/**
+ * @description 获取到当前的 HostRootFiber stateNode
+ * @param fiber
+ */
 export function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	let node = fiber;
 	let parent = node.return;
@@ -89,6 +94,7 @@ function renderRoot(root: FiberRootNode) {
 
 	// Fiber 树更新完成进行赋值
 	root.finishedWork = root.current.alternate;
+	// LJQFLAG 这里的赋值逻辑是什么
 	if (root.current.alternate?.child)
 		root.finishedWork = root.current.alternate.child;
 

@@ -9,7 +9,6 @@ import {
 
 let nextEffect: FiberNode | null = null;
 export const commitMutationEffects = (finishedWork: FiberNode) => {
-	console.log('commitMutationEffects', finishedWork);
 	nextEffect = finishedWork;
 	// 找到第一个 NoFlags 的 Fiber
 	// 然后向上遍历消费 tag
@@ -28,7 +27,7 @@ export const commitMutationEffects = (finishedWork: FiberNode) => {
 				const sibling: FiberNode | null = nextEffect.sibling;
 				if (sibling !== null) {
 					nextEffect = sibling;
-					break up;
+					break up; // LJQFLAG 为什么 break 掉
 				}
 				nextEffect = nextEffect.return;
 			}
@@ -37,7 +36,6 @@ export const commitMutationEffects = (finishedWork: FiberNode) => {
 };
 
 const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
-	console.log('commitMutationEffectsOnFiber', finishedWork);
 	const flags = finishedWork.flags;
 	if ((flags & Placement) !== NoFlags) {
 		commitPlacement(finishedWork);
@@ -49,14 +47,11 @@ const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
 };
 
 const commitPlacement = (finishedWork: FiberNode) => {
-	console.log(finishedWork, 'finishedWork');
 	// parent DOM
 	// finishedWork ~~ DOM
 	if (__DEV__) console.warn('执行 placement 操作');
 
 	const hostParent = getHostParent(finishedWork);
-
-	console.log(hostParent, 'hostParent');
 
 	if (hostParent) {
 		// appendInitialChild(hostParent, finishedWork.stateNode);

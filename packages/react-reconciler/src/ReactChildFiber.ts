@@ -4,8 +4,7 @@ import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols';
 import { HostText } from './ReactWorkTags';
 import { Placement } from './ReactFiberFlags';
 
-// LJQFLAG 构建 Fiber 树并标记副作用
-
+// 构建 Fiber 树并标记副作用
 // shouldTrackEffects 是否追踪副作用
 // true 追踪副作用 更新时调用
 // false 不追踪副作用 初次挂载时调用
@@ -58,14 +57,12 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			}
 		}
 		// TODO 多节点情况 ul>li*3
-
 		// HostText
 		if (typeof newChild === 'string' || typeof newChild === 'number') {
 			return placeSingleChild(
 				reconcileSingleTextNode(returnFiber, currentFiber, newChild)
 			);
 		}
-
 		if (__DEV__) console.warn('该节点不支持');
 		return null;
 	};

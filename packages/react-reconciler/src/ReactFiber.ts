@@ -1,4 +1,4 @@
-import { Props, Key, Ref, ReactElementType, Wakeable } from 'shared/ReactTypes';
+import { Props, Key, Ref, ReactElementType } from 'shared/ReactTypes';
 import {
 	ContextProvider,
 	Fragment,
@@ -20,21 +20,19 @@ import {
 } from 'shared/ReactSymbols';
 
 export class FiberNode {
-	type: any;
-	tag: WorkTag;
-	pendingProps: Props;
+	type: any; // span div 等标签类型
+	tag: WorkTag; // Fiber 类型 函数式组件/类式组件等
+	pendingProps: Props; // 传递给组件的 props
 	key: Key;
-	stateNode: any;
-	ref: Ref | null;
-
+	stateNode: any; // children 对应的 ReactElement
+	ref: Ref | null; // 引用
 	return: FiberNode | null; // 父节点
 	sibling: FiberNode | null; // 兄弟节点
 	child: FiberNode | null; // 子节点
 	index: number;
-
 	memoizedProps: Props | null; // 更新后的 Props
 	memoizedState: any; // 更新后的 State
-	alternate: FiberNode | null; // 指向 currentFiberNode 当前的 Fiber
+	alternate: FiberNode | null; // 指向 currentFiberNode 当前的 Fiber ( current树和workInprogress树之间的相互引用)
 	flags: Flags; // 当前的副作用 FLags
 	subtreeFlags: Flags; // 子树中包含的副作用 Flags
 	updateQueue: unknown;
@@ -94,37 +92,11 @@ export class FiberRootNode {
 	container: Container; // 挂载的 node
 	current: FiberNode; // 根 DOM FiberNode (hostRootFiber)
 	finishedWork: FiberNode | null; // 更新完成的 FiberNode (更新后的 hostRootFiber)
-	// pendingLanes: Lanes;
-	// suspendedLanes: Lanes;
-	// pingedLanes: Lanes;
-	// finishedLane: Lane;
-	// pendingPassiveEffects: PendingPassiveEffects;
-	//
-	// callbackNode: CallbackNode | null;
-	// callbackPriority: Lane;
-	//
-	// pingCache: WeakMap<Wakeable<any>, Set<Lane>> | null;
-
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
 		hostRootFiber.stateNode = this;
-
 		this.finishedWork = null;
-		// this.pendingLanes = NoLanes;
-		// this.suspendedLanes = NoLanes;
-		// this.pingedLanes = NoLanes;
-		// this.finishedLane = NoLane;
-		//
-		// this.callbackNode = null;
-		// this.callbackPriority = NoLane;
-		//
-		// this.pendingPassiveEffects = {
-		// 	unmount: [],
-		// 	update: []
-		// };
-		//
-		// this.pingCache = null;
 	}
 }
 
@@ -141,7 +113,6 @@ export const createWorkInProgress = (
 		// mount
 		workInProgress = new FiberNode(current.tag, pendingProps, current.key);
 		workInProgress.stateNode = current.stateNode;
-
 		workInProgress.alternate = current;
 		current.alternate = workInProgress;
 	} else {
@@ -157,18 +128,6 @@ export const createWorkInProgress = (
 	workInProgress.memoizedProps = current.memoizedProps;
 	workInProgress.memoizedState = current.memoizedState;
 	workInProgress.ref = current.ref;
-
-	// workInProgress.lanes = current.lanes;
-	// workInProgress.childLanes = current.childLanes;
-	//
-	// const currentDeps = current.dependencies;
-	// workInProgress.dependencies =
-	// 	currentDeps === null
-	// 		? null
-	// 		: {
-	// 				lanes: currentDeps.lanes,
-	// 				firstContext: currentDeps.firstContext
-	// 			};
 
 	return workInProgress;
 };

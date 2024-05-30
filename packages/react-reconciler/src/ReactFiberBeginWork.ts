@@ -67,7 +67,6 @@ export function reconcileChildren(
 	const current = workInProgress.alternate;
 	if (current !== null) {
 		// HostRootFiber 在初始化构建了 current 和 workInProgress 整个打标 Placement
-
 		// update
 		workInProgress.child = reconcileChildFibers(
 			workInProgress,
@@ -77,7 +76,6 @@ export function reconcileChildren(
 	} else {
 		// mount
 		// APP 没有 current 树会进行 mount 操作
-
 		workInProgress.child = mountChildFibers(workInProgress, null, children);
 	}
 }

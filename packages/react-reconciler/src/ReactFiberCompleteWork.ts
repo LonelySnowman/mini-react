@@ -94,7 +94,6 @@ function bubbleProperties(workInProgress: FiberNode) {
 	while (node !== null) {
 		subtreeFlags |= node.subtreeFlags;
 		subtreeFlags |= workInProgress.flags;
-
 		node.return = workInProgress;
 		node = node.sibling;
 	}

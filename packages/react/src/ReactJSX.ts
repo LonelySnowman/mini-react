@@ -23,11 +23,12 @@ const ReactElement = function (
 ): ReactElementType {
 	const element = {
 		$$typeof: REACT_ELEMENT_TYPE,
-		type,
+		type, // dom 类型 span/div ...
 		key,
 		ref,
 		props
 	};
+	console.log(element, 'ReactELement');
 	return element;
 };
 
