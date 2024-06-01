@@ -14,13 +14,12 @@ export function beginWork(workInProgress: FiberNode) {
 	switch (workInProgress.tag) {
 		case HostRoot:
 			return updateHostRoot(workInProgress);
-		// LJQFLAG 为什么这里无法触发更新？？？
 		case HostComponent:
 			return updateHostComponent(workInProgress);
-		case HostText:
-			return null;
 		case FunctionComponent:
 			return updateFunctionComponent(workInProgress);
+		case HostText:
+			return null;
 		default:
 			if (__DEV__) {
 				console.warn('beginWork类型未实现');
@@ -31,7 +30,6 @@ export function beginWork(workInProgress: FiberNode) {
 }
 
 function updateFunctionComponent(workInProgress: FiberNode) {
-	const nextProps = workInProgress.pendingProps;
 	const nextChildren = renderWithHooks(workInProgress);
 	reconcileChildren(workInProgress, nextChildren);
 	return workInProgress.child;

@@ -45,6 +45,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 		currentFiber: FiberNode | null,
 		newChild?: ReactElementType | string | number
 	) {
+		// LJQFLAG 多节点情况暂未支持
 		if (typeof newChild === 'object' && newChild !== null) {
 			switch (newChild.$$typeof) {
 				case REACT_ELEMENT_TYPE:
@@ -56,7 +57,6 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 					break;
 			}
 		}
-		// TODO 多节点情况 ul>li*3
 		// HostText
 		if (typeof newChild === 'string' || typeof newChild === 'number') {
 			return placeSingleChild(

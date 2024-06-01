@@ -1,8 +1,8 @@
 import { FiberNode } from './ReactFiber';
 
-export function renderWithHooks(workInprogress: FiberNode) {
-	const Component = workInprogress.type;
-	const props = workInprogress.pendingProps;
+export function renderWithHooks(workInProgress: FiberNode) {
+	const Component = workInProgress.type;
+	const props = workInProgress.pendingProps;
 	const children = Component(props);
 	return children;
 }

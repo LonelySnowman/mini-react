@@ -135,7 +135,7 @@ export const createWorkInProgress = (
 // 将 ReactElement 转化为 Fiber 树
 export function createFiberFromElement(element: ReactElementType): FiberNode {
 	const { type, key, props } = element;
-	let fiberTag: WorkTag = FunctionComponent;
+	let fiberTag: WorkTag = FunctionComponent; // 默认 FunctionComponent
 
 	if (typeof type === 'string') {
 		// <div/> type: 'div'

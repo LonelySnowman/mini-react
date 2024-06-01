@@ -94,9 +94,7 @@ function renderRoot(root: FiberRootNode) {
 
 	// Fiber 树更新完成进行赋值
 	root.finishedWork = root.current.alternate;
-	// LJQFLAG 这里的赋值逻辑是什么
-	if (root.current.alternate?.child)
-		root.finishedWork = root.current.alternate.child;
+	console.log(root.finishedWork);
 
 	// commit 阶段进行渲染
 	commitRoot(root);
@@ -120,7 +118,6 @@ function commitRoot(root: FiberRootNode) {
 		// mutation Placement
 		commitMutationEffects(finishedWork);
 		root.current = finishedWork;
-
 		// layout
 	} else {
 		root.current = finishedWork;
@@ -152,7 +149,6 @@ function completeUnitOfWork(fiber: FiberNode) {
 	let node: FiberNode | null = fiber;
 	do {
 		completeWork(node);
-
 		// 向上遍历 sibling FiberNode
 		const sibling = node?.sibling;
 		if (sibling !== null) {

@@ -34,6 +34,9 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 			}
 			bubbleProperties(workInProgress);
 			return null;
+		case FunctionComponent:
+			bubbleProperties(workInProgress);
+			return null;
 		case HostText:
 			// stateNode 为保存的 DOM 节点
 			if (current !== null && workInProgress.stateNode) {
@@ -44,9 +47,6 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 				// 2. 将 DOM 插入到 DOM 树
 				workInProgress.stateNode = instance;
 			}
-			bubbleProperties(workInProgress);
-			return null;
-		case FunctionComponent:
 			bubbleProperties(workInProgress);
 			return null;
 		default:
@@ -97,6 +97,5 @@ function bubbleProperties(workInProgress: FiberNode) {
 		node.return = workInProgress;
 		node = node.sibling;
 	}
-
 	workInProgress.subtreeFlags = subtreeFlags;
 }
