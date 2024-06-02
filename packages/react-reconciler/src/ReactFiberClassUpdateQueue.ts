@@ -1,6 +1,5 @@
 import { Action } from 'shared/ReactTypes';
 import { Dispatch } from 'react/src/ReactCurrentDispatcher';
-import * as buffer from 'buffer';
 
 /*
 代表更新的数据结构 update

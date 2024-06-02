@@ -34,11 +34,11 @@ export default [
 		input: `${pkgPath}/src/ReactJSX.ts`,
 		output: [
 			// jsx-runtime
-			{
-				file: `${pkgDistPath}/jsx-runtime.js`,
-				name: 'jsx-runtime',
-				format: 'umd'
-			},
+			// {
+			// 	file: `${pkgDistPath}/jsx-runtime.js`,
+			// 	name: 'jsx-runtime',
+			// 	format: 'umd'
+			// },
 			// jsx-dev-runtime
 			{
 				file: `${pkgDistPath}/jsx-dev-runtime.js`,

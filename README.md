@@ -213,9 +213,13 @@ commit 阶段的三个子阶段
 
 
 
+## 实现测试用例
+
+- 添加 jest 从 react 中复制测试用例，添加 babel 进行 jsx 转译，jest 会自动读取 babel 配置。
+
+
+
 ## 函数式组件实现
-
-
 
 ## 实现 useState
 
@@ -224,7 +228,9 @@ commit 阶段的三个子阶段
 
 需要实现数据共享层，在不同包之间共享使用的 HOOKS 集合。
 
-- 保存当前正在渲染的 Component FiberNode，memoizedState 存储 Hooks 链表
+- 保存当前正在渲染的 Component FiberNode，memoizedState 存储 Hooks 链表。
+- packages/react/src/ReactCurrentDispatcher.ts 实现，并在 packages/shared/internals.ts 将数据共享。
+- packages/react-reconciler/src/ReactFiberHooks.ts 实现 Hooks 的调度，不同的时机触发不同的 Hooks 集合。
 
 
 

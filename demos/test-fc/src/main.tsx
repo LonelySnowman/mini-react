@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 // const jsx = (
@@ -10,9 +10,10 @@ import ReactDOM from 'react-dom/client';
 // ReactDOM.createRoot(document.getElementById('root')).render(jsx);
 
 function App() {
+	const [num] = useState(1000);
 	return (
 		<div>
-			<span>mini-react</span>
+			<span>{num}</span>
 		</div>
 	);
 }

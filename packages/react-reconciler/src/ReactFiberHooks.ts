@@ -66,6 +66,7 @@ function mountState<State>(
 	const dispatch = dispatchSetState.bind(
 		null,
 		currentlyRenderingFiber,
+		// @ts-ignore
 		queue,
 		initialState
 	);
@@ -74,7 +75,7 @@ function mountState<State>(
 }
 
 function dispatchSetState<State>(
-	fiber: FiberNode,
+	fiber: FiberNode | null,
 	updateQueue: UpdateQueue<State>,
 	action: Action<State>
 ) {
@@ -83,6 +84,7 @@ function dispatchSetState<State>(
 	// 注册 update
 	enqueueUpdate(updateQueue, update);
 	// 消费 update
+	// @ts-ignore
 	scheduleUpdateOnFiber(fiber);
 }
 
