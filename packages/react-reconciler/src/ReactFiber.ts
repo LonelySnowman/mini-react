@@ -36,7 +36,7 @@ export class FiberNode {
 	flags: Flags; // 当前的副作用 FLags
 	subtreeFlags: Flags; // 子树中包含的副作用 Flags
 	updateQueue: unknown;
-	deletions: FiberNode[] | null;
+	deletions: FiberNode[] | null; // 该 Fiber 下需要被删除的子 Fiber
 
 	// lanes: Lanes;
 	// childLanes: Lanes;

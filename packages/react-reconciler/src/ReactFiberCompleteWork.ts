@@ -11,7 +11,7 @@ import {
 	createInstance,
 	createTextInstance
 } from 'hostConfig';
-import { NoFlags } from './ReactFiberFlags';
+import { NoFlags, Update } from './ReactFiberFlags';
 
 export const completeWork = (workInProgress: FiberNode | null) => {
 	const newProps = workInProgress?.pendingProps;
@@ -34,13 +34,15 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 			}
 			bubbleProperties(workInProgress);
 			return null;
-		case FunctionComponent:
-			bubbleProperties(workInProgress);
-			return null;
 		case HostText:
 			// stateNode 为保存的 DOM 节点
 			if (current !== null && workInProgress.stateNode) {
 				// update
+				const oldText = current?.memoizedProps.content;
+				const newText = newProps.content;
+				if (oldText !== newText) {
+					markUpdate(workInProgress);
+				}
 			} else {
 				// 1. 构建 DOM
 				const instance = createTextInstance(newProps.content);
@@ -49,11 +51,19 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 			}
 			bubbleProperties(workInProgress);
 			return null;
+		case FunctionComponent:
+			bubbleProperties(workInProgress);
+			return null;
 		default:
 			if (__DEV__) console.warn('该 wip tag 未实现', workInProgress?.tag);
 			break;
 	}
 };
+
+// 标记更新
+function markUpdate(fiber: FiberNode) {
+	fiber.flags |= Update;
+}
 
 function appendAllChildren(parent: Container, workInProgress: FiberNode) {
 	let node = workInProgress.child;

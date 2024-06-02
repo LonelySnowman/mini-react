@@ -221,6 +221,9 @@ commit 阶段的三个子阶段
 
 ## 函数式组件实现
 
+- 在 beginWork 与 complete work 中添加对应的 fiber.tag 处理 case。
+- 添加 renderWithHooks 方法创建函数式组件 Fiber。
+
 ## 实现 useState
 
 - hooks 必须在函数式组件中才有意义(hooks 的约定，只能在函数式组件中使用)，否则只是一个普通函数，需要感知上下文。
@@ -232,7 +235,25 @@ commit 阶段的三个子阶段
 - packages/react/src/ReactCurrentDispatcher.ts 实现，并在 packages/shared/internals.ts 将数据共享。
 - packages/react-reconciler/src/ReactFiberHooks.ts 实现 Hooks 的调度，不同的时机触发不同的 Hooks 集合。
 
+### Update 流程
 
+- beginWork：
+  - 需要处理 ChildDeletion 情况（删除）
+  - 处理节点移动情况
+- completeWork：
+  - 需要处理 HostText 内容更新情况
+  - 需要处理 HostComponent 属性变化情况
+- commitWork：
+  - 对于 ChildDeletion，需要遍历被删除的子树
+- useState：
+  - 实现相对于 mountState 的 updateState
+
+====
+
+- beginWork：
+  - packages/react-reconciler/src/ReactChildFiber.ts 
+  - 新增节点复用与节点删除流程，对比 key 与 tag 是否一致判断复用/删除，将原本 FiberNode Clone 后改变 Props。
+  - 
 
 # 原理链路梳理
 
