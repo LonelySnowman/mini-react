@@ -31,7 +31,7 @@ export class FiberNode {
 	child: FiberNode | null; // 子节点
 	index: number;
 	memoizedProps: Props | null; // 更新后的 Props
-	memoizedState: any; // 更新后的 State
+	memoizedState: any; // 指向 Hooks 链表
 	alternate: FiberNode | null; // 指向 currentFiberNode 当前的 Fiber ( current树和workInprogress树之间的相互引用)
 	flags: Flags; // 当前的副作用 FLags
 	subtreeFlags: Flags; // 子树中包含的副作用 Flags

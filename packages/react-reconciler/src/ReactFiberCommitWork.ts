@@ -37,7 +37,6 @@ export const commitMutationEffects = (finishedWork: FiberNode) => {
 };
 
 const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
-	console.log('进入 commit Fiber', finishedWork);
 	const flags = finishedWork.flags;
 	if ((flags & Placement) !== NoFlags) {
 		commitPlacement(finishedWork);
@@ -54,7 +53,6 @@ const commitPlacement = (finishedWork: FiberNode) => {
 	if (__DEV__) console.warn('执行 placement 操作');
 	const hostParent = getHostParent(finishedWork);
 	if (hostParent) {
-		// appendInitialChild(hostParent, finishedWork.stateNode);
 		appendPlacementNodeIntoContainer(hostParent, finishedWork);
 	}
 };
@@ -80,7 +78,6 @@ function appendPlacementNodeIntoContainer(
 	hostParent: Container,
 	finishedWork: FiberNode
 ) {
-	if (finishedWork === null) return;
 	if (finishedWork.tag === HostComponent || finishedWork.tag === HostText) {
 		appendChildToContainer(hostParent, finishedWork.stateNode);
 		return;
@@ -88,10 +85,10 @@ function appendPlacementNodeIntoContainer(
 	// 递归寻找 插入子节点及其 sibling
 	const child = finishedWork.child;
 	if (child !== null) {
-		appendPlacementNodeIntoContainer(hostParent, finishedWork.stateNode);
+		appendPlacementNodeIntoContainer(hostParent, child);
 		let sibling = child.sibling;
 		while (sibling !== null) {
-			appendPlacementNodeIntoContainer(hostParent, finishedWork.stateNode);
+			appendPlacementNodeIntoContainer(hostParent, sibling);
 			sibling = sibling.sibling;
 		}
 	}

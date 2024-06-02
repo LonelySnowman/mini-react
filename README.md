@@ -224,6 +224,8 @@ commit 阶段的三个子阶段
 
 需要实现数据共享层，在不同包之间共享使用的 HOOKS 集合。
 
+- 保存当前正在渲染的 Component FiberNode，memoizedState 存储 Hooks 链表
+
 
 
 # 原理链路梳理
