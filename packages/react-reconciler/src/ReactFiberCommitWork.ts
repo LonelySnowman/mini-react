@@ -1,10 +1,24 @@
 import { FiberNode, FiberRootNode } from './ReactFiber';
-import { MutationMask, NoFlags, Placement, Ref } from './ReactFiberFlags';
-import { HostComponent, HostRoot, HostText } from './ReactWorkTags';
+import {
+	ChildDeletion,
+	MutationMask,
+	NoFlags,
+	Placement,
+	Ref,
+	Update
+} from './ReactFiberFlags';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './ReactWorkTags';
 import {
 	appendChildToContainer,
 	appendInitialChild,
-	Container
+	commitUpdate,
+	Container,
+	removeChild
 } from 'hostConfig';
 
 let nextEffect: FiberNode | null = null;
@@ -38,13 +52,27 @@ export const commitMutationEffects = (finishedWork: FiberNode) => {
 
 const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
 	const flags = finishedWork.flags;
+	// flags Placement
 	if ((flags & Placement) !== NoFlags) {
 		commitPlacement(finishedWork);
 		// 移除 Placement Tag
 		finishedWork.flags &= ~Placement;
 	}
 	// flags Update
+	if ((flags & Update) !== NoFlags) {
+		commitUpdate(finishedWork);
+		finishedWork.flags &= ~Update;
+	}
 	// flags ChildDeletion
+	if ((flags & ChildDeletion) !== NoFlags) {
+		const deletions = finishedWork.deletions;
+		if (deletions !== null) {
+			deletions.forEach((childToDelete) => {
+				commitDeletion(childToDelete);
+			});
+		}
+		finishedWork.flags &= ~ChildDeletion;
+	}
 };
 
 const commitPlacement = (finishedWork: FiberNode) => {
@@ -56,6 +84,65 @@ const commitPlacement = (finishedWork: FiberNode) => {
 		appendPlacementNodeIntoContainer(hostParent, finishedWork);
 	}
 };
+
+function commitDeletion(childToDelete: FiberNode) {
+	let rootHostNode: FiberNode | null = null;
+	// 递归子树
+	commitNestedComponent(childToDelete, (unmountFiber) => {
+		switch (unmountFiber.tag) {
+			case HostComponent:
+				// 标记 root component
+				if (rootHostNode === null) rootHostNode = unmountFiber;
+				// TODO 解绑 Ref
+				return;
+			case HostText:
+				if (rootHostNode === null) rootHostNode = unmountFiber;
+				return;
+			case FunctionComponent:
+				// FunctionComponent Fiber上无实际内容
+				// TODO UseEffect unMount 处理
+				return;
+			default:
+				console.warn('未处理的 unmount 类型');
+				return;
+		}
+	});
+
+	// 移除 rootHostComponent 的 DOM
+	// 找到顶部需要删除的节点
+	// 在 hostParent 中删除该节点（页面中移除）
+	if (rootHostNode !== null) {
+		const hostParent = getHostParent(childToDelete);
+		if (hostParent !== null) removeChild(rootHostNode, hostParent);
+	}
+	// 节点在 Fiber 树中移除
+	childToDelete.return = null;
+	childToDelete.child = null;
+}
+
+function commitNestedComponent(
+	root: FiberNode,
+	onCommitUnmount: (fiber: FiberNode) => void
+) {
+	let node = root;
+	while (true) {
+		onCommitUnmount(node); // 需要清除副作用
+		// 向下遍历的过程
+		if (node.child !== null) {
+			node.child.return = node;
+			node = node.child;
+			continue;
+		}
+		// 终止条件
+		if (node === root) return;
+		while (node.sibling === null) {
+			if (node.return === null || node.return === root) return;
+			node = node.return;
+		}
+		node.sibling.return = node.return;
+		node = node.sibling;
+	}
+}
 
 function getHostParent(fiber: FiberNode): Container | null {
 	let parent = fiber.return;

@@ -252,8 +252,23 @@ commit 阶段的三个子阶段
 
 - beginWork：
   - packages/react-reconciler/src/ReactChildFiber.ts 
-  - 新增节点复用与节点删除流程，对比 key 与 tag 是否一致判断复用/删除，将原本 FiberNode Clone 后改变 Props。
-  - 
+  - 新增节点复用与节点删除流程，对比 key 与 tag 是否一致判断 复用/删除，将原本 FiberNode Clone 后改变 Props（暂无 Diff 流程）。
+- completeWork：
+  - packages/react-reconciler/src/ReactFiberCompleteWork.ts
+  - 标记更新，current 树为 null 且 workInProgress.stateNode !== null 需要进行更新流程，标记更新 Flag。
+    - HostText：oldText != newText 标记更新。
+
+- commitWork：
+  - packages/react-reconciler/src/ReactFiberCommitWork.ts（消费 Flags）
+  - 编写 commitUpdate 进行文本节点的更行。
+  - 编写 commitDelection 进行节点的删除（需要实现递归子树的操作清除副作用）
+    - 对于FC 需要处理 useEffect unMount
+    - 对于 HostComponent，需要解绑 ref
+    - 对于子树的 HostComponent 需要移除 DOM
+    - **最后利用 ReactDom 方法在页面中移除该几点，并将 Fiber 从树中移除**
+
+  - TODO SEE 24
+
 
 # 原理链路梳理
 
