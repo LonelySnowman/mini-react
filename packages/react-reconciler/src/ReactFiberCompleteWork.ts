@@ -40,6 +40,7 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 				// update
 				const oldText = current?.memoizedProps.content;
 				const newText = newProps.content;
+				console.log(`oldText: ${oldText}, newText: ${newText}`)
 				if (oldText !== newText) {
 					markUpdate(workInProgress);
 				}
@@ -103,7 +104,7 @@ function bubbleProperties(workInProgress: FiberNode) {
 	let node = workInProgress.child;
 	while (node !== null) {
 		subtreeFlags |= node.subtreeFlags;
-		subtreeFlags |= workInProgress.flags;
+		subtreeFlags |= node.flags;
 		node.return = workInProgress;
 		node = node.sibling;
 	}

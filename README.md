@@ -257,7 +257,6 @@ commit 阶段的三个子阶段
   - packages/react-reconciler/src/ReactFiberCompleteWork.ts
   - 标记更新，current 树为 null 且 workInProgress.stateNode !== null 需要进行更新流程，标记更新 Flag。
     - HostText：oldText != newText 标记更新。
-
 - commitWork：
   - packages/react-reconciler/src/ReactFiberCommitWork.ts（消费 Flags）
   - 编写 commitUpdate 进行文本节点的更行。
@@ -266,8 +265,11 @@ commit 阶段的三个子阶段
     - 对于 HostComponent，需要解绑 ref
     - 对于子树的 HostComponent 需要移除 DOM
     - **最后利用 ReactDom 方法在页面中移除该几点，并将 Fiber 从树中移除**
+- useState：
+  - 针对于 update 流程的 dispatcher
+  - 实现对标 mountWorkInProgressHook 的 updateWorkInProgressHook
+  - 实现 updateState 中计算新 state 的逻辑
 
-  - TODO SEE 24
 
 
 # 原理链路梳理

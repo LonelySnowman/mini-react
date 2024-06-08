@@ -9,11 +9,16 @@ import ReactDOM from 'react-dom/client';
 //
 // ReactDOM.createRoot(document.getElementById('root')).render(jsx);
 
+function Child() {
+	return <div>num 小于10</div>
+}
+
 function App() {
-	const [num] = useState(1000);
+	const [num, setNum] = useState(1000);
+	window.setNum = setNum;
 	return (
 		<div>
-			<span>{num}</span>
+			{num > 10 ? num : <Child></Child>}
 		</div>
 	);
 }

@@ -88,7 +88,7 @@ const commitPlacement = (finishedWork: FiberNode) => {
 function commitDeletion(childToDelete: FiberNode) {
 	let rootHostNode: FiberNode | null = null;
 	// 递归子树
-	commitNestedComponent(childToDelete, (unmountFiber) => {
+	commitNestedComponent(childToDelete, (unmountFiber: FiberNode) => {
 		switch (unmountFiber.tag) {
 			case HostComponent:
 				// 标记 root component
@@ -113,7 +113,7 @@ function commitDeletion(childToDelete: FiberNode) {
 	// 在 hostParent 中删除该节点（页面中移除）
 	if (rootHostNode !== null) {
 		const hostParent = getHostParent(childToDelete);
-		if (hostParent !== null) removeChild(rootHostNode, hostParent);
+		if (hostParent !== null) removeChild((rootHostNode as FiberNode).stateNode, hostParent);
 	}
 	// 节点在 Fiber 树中移除
 	childToDelete.return = null;
