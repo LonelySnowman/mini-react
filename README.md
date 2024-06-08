@@ -272,6 +272,8 @@ commit 阶段的三个子阶段
 
 ## 实现事件系统
 
+> packages\react-dom\src\SyntheticEvents.ts 实现事件代理与收集机制
+
 事件系统基于 ReactDom，要与 reconciler 分离，在宿主环境中实现。
 
 - 实现浏览器事件捕获机制，冒泡流程。
@@ -284,7 +286,7 @@ commit 阶段的三个子阶段
 - 创建 DOM 时
 - 更新属性时
 
-
+// TODO LOOK 25
 
 # 原理链路梳理
 
