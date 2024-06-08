@@ -10,15 +10,17 @@ import ReactDOM from 'react-dom/client';
 // ReactDOM.createRoot(document.getElementById('root')).render(jsx);
 
 function Child() {
-	return <div>num 小于10</div>
+	return <div>num大于10</div>
 }
 
 function App() {
-	const [num, setNum] = useState(1000);
-	window.setNum = setNum;
+	const [num, setNum] = useState(1);
 	return (
-		<div>
-			{num > 10 ? num : <Child></Child>}
+		<div onClick={()=>{
+			console.log('事件触发');
+			setNum(num + 1)
+		}}>
+			{num < 10 ? num : <Child></Child>}
 		</div>
 	);
 }

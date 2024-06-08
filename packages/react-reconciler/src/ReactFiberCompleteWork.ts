@@ -12,6 +12,7 @@ import {
 	createTextInstance
 } from 'hostConfig';
 import { NoFlags, Update } from './ReactFiberFlags';
+import { updateFiberProps } from 'react-dom/src/SyntheticEvents';
 
 export const completeWork = (workInProgress: FiberNode | null) => {
 	const newProps = workInProgress?.pendingProps;
@@ -25,6 +26,12 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 			// stateNode 为保存的 DOM 节点
 			if (current !== null && workInProgress.stateNode) {
 				// update
+				// props 是否变化
+
+				// props 变化标记 Update
+
+				// 标记 Props
+				updateFiberProps(workInProgress.stateNode, newProps);
 			} else {
 				// 1. 构建 DOM
 				const instance = createInstance(workInProgress.type, newProps);
@@ -40,7 +47,6 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 				// update
 				const oldText = current?.memoizedProps.content;
 				const newText = newProps.content;
-				console.log(`oldText: ${oldText}, newText: ${newText}`)
 				if (oldText !== newText) {
 					markUpdate(workInProgress);
 				}

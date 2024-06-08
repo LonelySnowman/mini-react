@@ -1,13 +1,16 @@
 import { FiberNode } from 'react-reconciler/src/ReactFiber';
-import { HostText } from 'react-reconciler/src/ReactWorkTags';
+import { HostComponent, HostText } from 'react-reconciler/src/ReactWorkTags';
+import { updateFiberProps } from './SyntheticEvents';
+import { Props } from 'shared/ReactTypes';
 
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
 
-export const createInstance = (type: string, props: any): Instance => {
+export const createInstance = (type: string, props: Props): Instance => {
 	// TODO 处理 props
 	const element = document.createElement(type);
+	updateFiberProps(element, props); // 在 DOM 上存储 Fiber Props
 	return element;
 };
 
@@ -29,7 +32,8 @@ export function commitUpdate(fiber: FiberNode) {
 		case HostText:
 			const text = fiber.memoizedProps.content;
 			return commitTextUpdate(fiber.stateNode, text);
-			break;
+		case HostComponent:
+			// updateFiberProps
 		default:
 			if (__DEV__) {
 				console.warn('未实现的 Update 类型');

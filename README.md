@@ -270,6 +270,20 @@ commit 阶段的三个子阶段
   - 实现对标 mountWorkInProgressHook 的 updateWorkInProgressHook
   - 实现 updateState 中计算新 state 的逻辑
 
+## 实现事件系统
+
+事件系统基于 ReactDom，要与 reconciler 分离，在宿主环境中实现。
+
+- 实现浏览器事件捕获机制，冒泡流程。
+- 实现合成事件对象。
+
+### ReactDom 于 Reconciler 的对接
+
+> 可以说 props 变更时就是需要更新事件时（与事件相关的 props）
+
+- 创建 DOM 时
+- 更新属性时
+
 
 
 # 原理链路梳理
