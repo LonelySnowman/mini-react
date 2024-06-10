@@ -286,7 +286,29 @@ commit 阶段的三个子阶段
 - 创建 DOM 时
 - 更新属性时
 
-// TODO LOOK 25
+## Diff 算法
+
+- key 相同，type 相同 == 复用当前节点
+- key 相同，type 不同 == 不存在任何复用的可能性
+- key 不同，type 相同 == 当前节点不能复用
+- key 不同，type 不同 == 当前节点不能复用
+
+### 多节点->单节点
+
+需要改造 reconcileSingleElement 与 reconcileSingleTextNode 处理多节点变单节点的情况，直接遍历 diff 进行复用。
+
+### 单/多节点->多节点
+
+单节点副作用：Placement，ChildDeletion
+
+多节点副作用：Placement，ChildDeletion，Placement
+
+- current 同级 fiber 保存在 Map 中
+- 遍历 newChild 数组，对于每个遍历到的 element，存在两种情况：
+  - 在 Map 中存在对应 currentFiber，且可以/不能复用
+  - 在 Map 中不存在对应 currentFiber
+- 判断是插入化石移动
+- 最后 Map 中剩下的都标记删除
 
 # 原理链路梳理
 
