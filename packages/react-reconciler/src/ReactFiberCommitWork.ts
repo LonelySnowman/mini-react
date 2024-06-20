@@ -18,6 +18,8 @@ import {
 	appendInitialChild,
 	commitUpdate,
 	Container,
+	insertChildToContainer,
+	Instance,
 	removeChild
 } from 'hostConfig';
 
@@ -76,14 +78,64 @@ const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
 };
 
 const commitPlacement = (finishedWork: FiberNode) => {
-	// parent DOM
 	// finishedWork ~~ DOM
 	if (__DEV__) console.warn('执行 placement 操作');
+
+	// parent DOM
 	const hostParent = getHostParent(finishedWork);
+
+	// host sibling
+	// 找到 sibling 要向下遍历，找到 HostComponent 进行插入，因为有可能 sibling 为 FC 无 DOM
+	const sibling = getHostSibling(finishedWork);
+
 	if (hostParent) {
-		appendPlacementNodeIntoContainer(hostParent, finishedWork);
+		insertOrAppendPlacementNodeIntoContainer(hostParent, finishedWork, sibling);
 	}
 };
+
+function getHostSibling(fiber: FiberNode) {
+	let node: FiberNode = fiber;
+
+	findSibling: while (true) {
+		/**
+		 * <App/> <div/> 情景
+		 */
+		// 向上找
+		while (node.sibling === null) {
+			const parent = node.return;
+			// 终止条件 未找到满足的节点
+			// LJQFLAG 终止条件不理解
+			if (
+				parent === null ||
+				parent.tag === HostComponent ||
+				parent.tag === HostRoot
+			) {
+				return null;
+			}
+			node = parent;
+		}
+		node.sibling.return = node.return;
+		node = node.sibling;
+
+		/**
+		 * <div/> <App/> 情景
+		 */
+		while (node.tag !== HostText && node.tag !== HostComponent) {
+			// 向下遍历找子孙节点
+			// 节点不稳定
+			if ((node.flags & Placement) !== NoFlags) continue findSibling;
+			if (node.child === null) {
+				continue findSibling;
+			} else {
+				node.child.return = node;
+				node = node.child;
+			}
+		}
+
+		// 找到了可以插入的目标节点
+		if ((node.flags & Placement) === NoFlags) return node.stateNode;
+	}
+}
 
 function commitDeletion(childToDelete: FiberNode) {
 	let rootHostNode: FiberNode | null = null;
@@ -113,7 +165,8 @@ function commitDeletion(childToDelete: FiberNode) {
 	// 在 hostParent 中删除该节点（页面中移除）
 	if (rootHostNode !== null) {
 		const hostParent = getHostParent(childToDelete);
-		if (hostParent !== null) removeChild((rootHostNode as FiberNode).stateNode, hostParent);
+		if (hostParent !== null)
+			removeChild((rootHostNode as FiberNode).stateNode, hostParent);
 	}
 	// 节点在 Fiber 树中移除
 	childToDelete.return = null;
@@ -161,21 +214,26 @@ function getHostParent(fiber: FiberNode): Container | null {
 }
 
 // LJQFLAG 为什么只插入一个
-function appendPlacementNodeIntoContainer(
+function insertOrAppendPlacementNodeIntoContainer(
 	hostParent: Container,
-	finishedWork: FiberNode
+	finishedWork: FiberNode,
+	before?: Instance
 ) {
 	if (finishedWork.tag === HostComponent || finishedWork.tag === HostText) {
-		appendChildToContainer(hostParent, finishedWork.stateNode);
+		if (before) {
+			insertChildToContainer(finishedWork.stateNode, hostParent, before);
+		} else {
+			appendChildToContainer(hostParent, finishedWork.stateNode);
+		}
 		return;
 	}
 	// 递归寻找 插入子节点及其 sibling
 	const child = finishedWork.child;
 	if (child !== null) {
-		appendPlacementNodeIntoContainer(hostParent, child);
+		insertOrAppendPlacementNodeIntoContainer(hostParent, child);
 		let sibling = child.sibling;
 		while (sibling !== null) {
-			appendPlacementNodeIntoContainer(hostParent, sibling);
+			insertOrAppendPlacementNodeIntoContainer(hostParent, sibling);
 			sibling = sibling.sibling;
 		}
 	}

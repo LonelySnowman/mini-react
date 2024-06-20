@@ -301,7 +301,7 @@ commit 阶段的三个子阶段
 
 单节点副作用：Placement，ChildDeletion
 
-多节点副作用：Placement，ChildDeletion，Placement
+多节点副作用：Placement(创建)，ChildDeletion，Placement(移动)
 
 - current 同级 fiber 保存在 Map 中
 - 遍历 newChild 数组，对于每个遍历到的 element，存在两种情况：
@@ -309,6 +309,12 @@ commit 阶段的三个子阶段
   - 在 Map 中不存在对应 currentFiber
 - 判断是插入化石移动
 - 最后 Map 中剩下的都标记删除
+
+### 移动具体指的是向右移动
+
+
+
+
 
 # 原理链路梳理
 

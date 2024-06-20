@@ -25,7 +25,10 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			deletions.push(childToDelete);
 		}
 	}
-	function deleteRemainingChildren(returnFiber: FiberNode, currentFirstChild: FiberNode | null) {
+	function deleteRemainingChildren(
+		returnFiber: FiberNode,
+		currentFirstChild: FiberNode | null
+	) {
 		if (!shouldTrackEffects) return;
 		let childToDelete = currentFirstChild;
 		while (childToDelete !== null) {
@@ -107,7 +110,11 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 		return fiber;
 	}
 
-	function reconcileChildrenArray(returnFiber: FiberNode, currentFirstChild: FiberNode | null, newChild: any[]) {
+	function reconcileChildrenArray(
+		returnFiber: FiberNode,
+		currentFirstChild: FiberNode | null,
+		newChild: any[]
+	) {
 		// 最后一个可复用 Fiber 在 current 树中的索引
 		let lastPlacedIndex: number = 0;
 		let lastNewFiber: FiberNode | null = null;
@@ -122,7 +129,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			current = current.sibling;
 		}
 		// 2.遍历 newChild 寻找是否可复用
-		for (let i=0;i<newChild.length;i++) {
+		for (let i = 0; i < newChild.length; i++) {
 			const after = newChild[i];
 			const newFiber = updateFromMap(returnFiber, existingChildren, i, after);
 			if (newFiber === null) continue; // 不可复用继续
@@ -156,17 +163,22 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			}
 		}
 		// 4.将无需复用的节点标记删除
-		existingChildren.forEach(fiber=>{
+		existingChildren.forEach((fiber) => {
 			deleteChild(returnFiber, fiber);
-		})
+		});
 		return firstNewFiber;
 	}
 
 	// 从 Map 中进行复用
-	function updateFromMap(returnFiber: FiberNode, existringChildren: ExistingChildren, index: number, element: any): FiberNode | null {
+	function updateFromMap(
+		returnFiber: FiberNode,
+		existringChildren: ExistingChildren,
+		index: number,
+		element: any
+	): FiberNode | null {
 		// props 未传入 key 默认以 index 作为 key
 		const keyToUse = element.key !== null ? element.key : element.index;
-		const before = existringChildren.get(keyToUse)
+		const before = existringChildren.get(keyToUse);
 		if (typeof element === 'string' || typeof element === 'number') {
 			if (before) {
 				if (before.tag === HostText) {
@@ -208,6 +220,13 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 		currentFiber: FiberNode | null,
 		newChild?: ReactElementType | string | number
 	) {
+		// 多节点类型
+		if (Array.isArray(newChild)) {
+			return placeSingleChild(
+				reconcileChildrenArray(returnFiber, currentFiber, newChild)
+			);
+		}
+
 		// HostComponent
 		if (typeof newChild === 'object' && newChild !== null) {
 			switch (newChild.$$typeof) {
@@ -221,18 +240,13 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			}
 		}
 
-		if (Array.isArray(newChild)) {
-			reconcileChildrenArray(returnFiber, currentFiber, newChild) {
-				
-			}
-		}
 		// HostText
 		if (typeof newChild === 'string' || typeof newChild === 'number') {
 			return placeSingleChild(
 				reconcileSingleTextNode(returnFiber, currentFiber, newChild)
 			);
 		}
-		if (__DEV__) console.warn('该节点不支持');
+		if (__DEV__) console.warn('该节点不支持', newChild, typeof newChild);
 		// 兜底标记删除
 		if (currentFiber) deleteChild(returnFiber, currentFiber);
 		return null;
