@@ -1,5 +1,20 @@
 # MiniReact
 
+## 介绍
+
+React 原理学习项目，实现简易 React 及其相关工具链，并搭配相关教程。
+
+- 对接 babel 实现 JSX 转换 ✅
+- 实现基本 FiberNode 双缓冲架构 ✅
+- 实现 React 事件机制 ✅
+- 实现 React 多节点渲染 Diff 算法 ✅
+- 实现 useState  ✅
+- 更多 hooks 学习中...
+
+**参考学习项目**：[BetaSu/big-react](https://github.com/BetaSu/big-react)
+
+# 学习小记
+
 ## React架构
 
 - 调度更新（Scheduler 调度器）
@@ -312,9 +327,7 @@ commit 阶段的三个子阶段
 
 ### 移动具体指的是向右移动
 
-
-
-
+- 新节点在最右侧，但是发现原先在新节点在 last 左侧，则需要标记移动。
 
 # 原理链路梳理
 
@@ -440,6 +453,4 @@ export class FiberRootNode {
       1. 根据 finishedWork subtreeFlags 和 flags 判断是否有需要执行的副作用。
       2. 有副作用执行副作用 `commitMutationEffects` 副作用执行流程不熟悉
       3. current 树转化为 finishedWork 也就是构建好的 workInProgress
-
-// 看看两个 LJQFLAG
 

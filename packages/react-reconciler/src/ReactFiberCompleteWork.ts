@@ -47,9 +47,7 @@ export const completeWork = (workInProgress: FiberNode | null) => {
 				// update
 				const oldText = current?.memoizedProps.content;
 				const newText = newProps.content;
-				if (oldText !== newText) {
-					markUpdate(workInProgress);
-				}
+				if (oldText !== newText) markUpdate(workInProgress);
 			} else {
 				// 1. 构建 DOM
 				const instance = createTextInstance(newProps.content);

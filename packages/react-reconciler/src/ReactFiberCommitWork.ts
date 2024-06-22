@@ -15,7 +15,6 @@ import {
 } from './ReactWorkTags';
 import {
 	appendChildToContainer,
-	appendInitialChild,
 	commitUpdate,
 	Container,
 	insertChildToContainer,
@@ -43,8 +42,9 @@ export const commitMutationEffects = (finishedWork: FiberNode) => {
 				commitMutationEffectsOnFiber(nextEffect);
 				const sibling: FiberNode | null = nextEffect.sibling;
 				if (sibling !== null) {
+					// sibling 存在则 sibling 继续消费副作用
 					nextEffect = sibling;
-					break up; // LJQFLAG 为什么 break 掉
+					break up;
 				}
 				nextEffect = nextEffect.return;
 			}
@@ -78,24 +78,21 @@ const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
 };
 
 const commitPlacement = (finishedWork: FiberNode) => {
-	// finishedWork ~~ DOM
 	if (__DEV__) console.warn('执行 placement 操作');
 
-	// parent DOM
+	// Parent DOM
 	const hostParent = getHostParent(finishedWork);
 
-	// host sibling
+	// Host sibling
 	// 找到 sibling 要向下遍历，找到 HostComponent 进行插入，因为有可能 sibling 为 FC 无 DOM
 	const sibling = getHostSibling(finishedWork);
 
-	if (hostParent) {
+	if (hostParent)
 		insertOrAppendPlacementNodeIntoContainer(hostParent, finishedWork, sibling);
-	}
 };
 
 function getHostSibling(fiber: FiberNode) {
 	let node: FiberNode = fiber;
-
 	findSibling: while (true) {
 		/**
 		 * <App/> <div/> 情景
@@ -151,7 +148,7 @@ function commitDeletion(childToDelete: FiberNode) {
 				if (rootHostNode === null) rootHostNode = unmountFiber;
 				return;
 			case FunctionComponent:
-				// FunctionComponent Fiber上无实际内容
+				// FunctionComponent Fiber 上无实际内容
 				// TODO UseEffect unMount 处理
 				return;
 			default:
@@ -213,12 +210,12 @@ function getHostParent(fiber: FiberNode): Container | null {
 	return null;
 }
 
-// LJQFLAG 为什么只插入一个
 function insertOrAppendPlacementNodeIntoContainer(
 	hostParent: Container,
 	finishedWork: FiberNode,
 	before?: Instance
 ) {
+	// 可以插入直接进行插入
 	if (finishedWork.tag === HostComponent || finishedWork.tag === HostText) {
 		if (before) {
 			insertChildToContainer(finishedWork.stateNode, hostParent, before);
@@ -227,7 +224,8 @@ function insertOrAppendPlacementNodeIntoContainer(
 		}
 		return;
 	}
-	// 递归寻找 插入子节点及其 sibling
+
+	// 节点为 FC 插入失败寻找可插入节点
 	const child = finishedWork.child;
 	if (child !== null) {
 		insertOrAppendPlacementNodeIntoContainer(hostParent, child);

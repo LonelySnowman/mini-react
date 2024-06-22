@@ -48,7 +48,11 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 	}
 
 	// 1.收集沿途的事件
-	const { bubble, capture } = collectPaths(targetElement as DOMElement, container, eventType);
+	const { bubble, capture } = collectPaths(
+		targetElement as DOMElement,
+		container,
+		eventType
+	);
 	// 2.构造合成事件
 	const synctheticEvent = createSyntheticEvent(e);
 	// 3.遍历 capture 捕获阶段
@@ -57,7 +61,6 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 		// 4.遍历 bubble 冒泡阶段
 		triggerEventFlow(bubble, synctheticEvent);
 	}
-	
 }
 
 function getEventCallbackNameFromEventType(
@@ -68,7 +71,11 @@ function getEventCallbackNameFromEventType(
 	}[eventType];
 }
 
-function collectPaths(targetElement: DOMElement, container: Container, eventType: string) {
+function collectPaths(
+	targetElement: DOMElement,
+	container: Container,
+	eventType: string
+) {
 	const path: Paths = {
 		capture: [],
 		bubble: []
@@ -79,20 +86,20 @@ function collectPaths(targetElement: DOMElement, container: Container, eventType
 		const elementProps = targetElement[elementPropsKey];
 		if (elementProps) {
 			// click -> onClickCapture onCLick
-			const callbackNameList = getEventCallbackNameFromEventType(eventType);			
+			const callbackNameList = getEventCallbackNameFromEventType(eventType);
 			if (callbackNameList) {
 				callbackNameList.forEach((callbackName, i) => {
 					// @ts-ignore
-					const eventCalback = elementProps[callbackName];
+					const eventCallback = elementProps[callbackName];
 					// 使用 unshift 与 push 符合捕获与冒泡机制按顺序触发
-					if (eventCalback) {
+					if (eventCallback) {
 						if (i === 0) {
-							path.capture.unshift(eventCalback);
+							path.capture.unshift(eventCallback);
 						} else {
-							path.bubble.push(eventCalback);
+							path.bubble.push(eventCallback);
 						}
 					}
-				})
+				});
 			}
 		}
 		targetElement = targetElement.parentNode as DOMElement;
@@ -111,12 +118,15 @@ function createSyntheticEvent(e: Event): SynctheticEvent {
 		if (originStopPropagation) {
 			originStopPropagation();
 		}
-	}
+	};
 	return synctheticEvent;
 }
 
-function triggerEventFlow(paths: EventCallBack[], synctheticEvent: SynctheticEvent) {
-	for (let i=0; i<paths.length; i++) {
+function triggerEventFlow(
+	paths: EventCallBack[],
+	synctheticEvent: SynctheticEvent
+) {
+	for (let i = 0; i < paths.length; i++) {
 		const callback = paths[i];
 		callback.call(null, synctheticEvent);
 		if (synctheticEvent.__stopPropagation) break; // 阻止事件传递

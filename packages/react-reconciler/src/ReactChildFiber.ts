@@ -115,9 +115,8 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 		currentFirstChild: FiberNode | null,
 		newChild: any[]
 	) {
-		// 最后一个可复用 Fiber 在 current 树中的索引
-		let lastPlacedIndex: number = 0;
-		let lastNewFiber: FiberNode | null = null;
+		let lastPlacedIndex: number = 0; // 最后一个可复用 Fiber 在 current 树中的索引
+		let lastNewFiber: FiberNode | null = null; // 遍历过程种最右侧的 Fiber
 		let firstNewFiber: FiberNode | null = null; // 复用的第一个 Fiber
 		// 1.将 current 保存在 Map 中
 		const existingChildren: ExistingChildren = new Map();
@@ -128,15 +127,17 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			existingChildren.set(keyToUse, current);
 			current = current.sibling;
 		}
+
 		// 2.遍历 newChild 寻找是否可复用
 		for (let i = 0; i < newChild.length; i++) {
 			const after = newChild[i];
 			const newFiber = updateFromMap(returnFiber, existingChildren, i, after);
-			if (newFiber === null) continue; // 不可复用继续
+			if (newFiber === null) continue; // 更新后的值为 false 或 null
+
 			// 3.标记移动还是插入
 			newFiber.index = i;
 			newFiber.return = returnFiber;
-
+			// 使用 sibling 构建新的同级 fiber 树
 			if (lastNewFiber === null) {
 				lastNewFiber = newFiber;
 				firstNewFiber = newFiber;
@@ -144,24 +145,21 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 				lastNewFiber.sibling = newFiber;
 				lastNewFiber = lastNewFiber.sibling;
 			}
-
 			if (!shouldTrackEffects) continue;
 			const current = newFiber.alternate;
 			if (current !== null) {
 				const oldIndex = current.index;
 				if (oldIndex < lastPlacedIndex) {
-					// 移动
-					newFiber.flags |= Placement;
+					newFiber.flags |= Placement; // 需要向右移动 相对位置发生变化 (现在位置在 last 右边 原来位置在 last 左边)
 					continue;
 				} else {
-					// 不移动
-					lastPlacedIndex = oldIndex;
+					lastPlacedIndex = oldIndex; // 不移动
 				}
 			} else {
-				// mount (对应插入)
-				newFiber.flags |= Placement;
+				newFiber.flags |= Placement; // mount (对应插入)
 			}
 		}
+
 		// 4.将无需复用的节点标记删除
 		existingChildren.forEach((fiber) => {
 			deleteChild(returnFiber, fiber);
@@ -172,17 +170,19 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 	// 从 Map 中进行复用
 	function updateFromMap(
 		returnFiber: FiberNode,
-		existringChildren: ExistingChildren,
+		existingChildren: ExistingChildren,
 		index: number,
 		element: any
 	): FiberNode | null {
 		// props 未传入 key 默认以 index 作为 key
 		const keyToUse = element.key !== null ? element.key : element.index;
-		const before = existringChildren.get(keyToUse);
+		const before = existingChildren.get(keyToUse);
+
+		// 新增类型为 HostText
 		if (typeof element === 'string' || typeof element === 'number') {
 			if (before) {
 				if (before.tag === HostText) {
-					existringChildren.delete(keyToUse);
+					existingChildren.delete(keyToUse);
 					return useFiber(before, { content: String(element) });
 				}
 				return new FiberNode(HostText, { content: String(element) }, null);
@@ -195,7 +195,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 				case REACT_ELEMENT_TYPE:
 					if (before) {
 						if (before.type === element.type) {
-							existringChildren.delete(keyToUse);
+							existingChildren.delete(keyToUse);
 							return useFiber(before, element.props);
 						}
 					}
@@ -211,7 +211,7 @@ export function ChildReconcile(shouldTrackEffects: boolean) {
 			console.warn('数组类型 child 未实现');
 		}
 
-		// 不可复用返回 null
+		// 更新后的值暂不支持或为 false / null
 		return null;
 	}
 

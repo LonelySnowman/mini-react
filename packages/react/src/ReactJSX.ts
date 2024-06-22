@@ -28,7 +28,6 @@ const ReactElement = function (
 		ref,
 		props
 	};
-	console.log(element, 'ReactELement');
 	return element;
 };
 

@@ -18,7 +18,8 @@ function App() {
 	const arr = [
 		<div key="1">1</div>,
 		<div key="2">2</div>,
-		<div key="3">3</div>
+		<div key="3">3</div>,
+		<div key="4">4</div>
 	];
 
 	const arr2 = [
